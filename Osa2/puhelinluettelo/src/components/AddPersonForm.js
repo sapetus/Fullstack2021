@@ -69,9 +69,11 @@ const AddPersonForm = (props) => {
             setTimeout(() => {
                 props.setMessage(null);
             }, 3500);
-            personService.create(personObject).then(response => {
-                props.setPersons(props.persons.concat(response))
-            });
+            personService
+                .create(personObject)
+                .then(response => {
+                    props.setPersons(props.persons.concat(response))
+                });
             props.setNewName('');
             props.setNewNumber('');
         }
