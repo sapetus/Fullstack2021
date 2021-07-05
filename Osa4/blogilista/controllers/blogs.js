@@ -58,14 +58,29 @@ blogsRouter.delete('/:id', async (request, response) => {
 
 //update a specific blog
 blogsRouter.put('/:id', async (request, response) => {
+    //get body of the request
     const requestBody = request.body
+    const blogUpdate = {...requestBody}
 
-    const blog = {...requestBody}
+    //the blog to be updated
+    const blogToUpdate = await Blog.findById(request.params.id)
 
-    await Blog
-        .findByIdAndUpdate(request.params.id, blog, {new: true})
-    
-    response.json(blog.toJSON())
+    //check that the token is valid
+    if (!request.token || !request.user) {
+        return response.status(401).json({ error: 'token missing or invalid' })
+    }
+
+    //check that token id is the same as blogs user id
+    if (blogToUpdate.user.toString() === request.user) {
+        try {
+            await Blog.findByIdAndUpdate(request.params.id, blogUpdate, {new: true})
+            response.status(200).end()
+        } catch (err) {
+            response.json({ error: err.message })
+        }
+    } else {
+        response.status(401).json({ error: 'token is invalid' })
+    }
 })
 
 module.exports = blogsRouter
