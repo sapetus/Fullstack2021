@@ -8,7 +8,7 @@ blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog
         .find({})
         .populate('user', { username: 1, name: 1 })
-    
+
     response.json(blogs)
 })
 
@@ -30,7 +30,7 @@ blogsRouter.post('/', async (request, response) => {
         blog.likes = 0
     }
 
-    if(!blog.title || !blog.url) {
+    if (!blog.title || !blog.url) {
         response.status(400).end()
     } else {
         await blog.save()
@@ -60,7 +60,7 @@ blogsRouter.delete('/:id', async (request, response) => {
 blogsRouter.put('/:id', async (request, response) => {
     //get body of the request
     const requestBody = request.body
-    const blogUpdate = {...requestBody}
+    const blogUpdate = { ...requestBody }
 
     //the blog to be updated
     const blogToUpdate = await Blog.findById(request.params.id)
@@ -70,17 +70,26 @@ blogsRouter.put('/:id', async (request, response) => {
         return response.status(401).json({ error: 'token missing or invalid' })
     }
 
-    //check that token id is the same as blogs user id
-    if (blogToUpdate.user.toString() === request.user) {
-        try {
-            await Blog.findByIdAndUpdate(request.params.id, blogUpdate, {new: true})
-            response.status(200).end()
-        } catch (err) {
-            response.json({ error: err.message })
-        }
-    } else {
-        response.status(401).json({ error: 'token is invalid' })
+    //the update itself
+    try {
+        await Blog.findByIdAndUpdate(request.params.id, blogUpdate, { new: true })
+        response.status(200).end()
+    } catch (err) {
+        response.json({ error: err.message })
     }
+
+    //to allow updating only by the user who created the blog, uncomment this
+    // //check that token id is the same as blogs user id
+    // if (blogToUpdate.user.toString() === request.user) {
+    //     try {
+    //         await Blog.findByIdAndUpdate(request.params.id, blogUpdate, {new: true})
+    //         response.status(200).end()
+    //     } catch (err) {
+    //         response.json({ error: err.message })
+    //     }
+    // } else {
+    //     response.status(401).json({ error: 'token is invalid' })
+    // }
 })
 
 module.exports = blogsRouter
