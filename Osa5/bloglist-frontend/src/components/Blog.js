@@ -34,12 +34,10 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
 
   if (!visible) {
     return (
-      <div className='blog-field'>
-        <p>
-          {blog.title}, {blog.author}
-          &nbsp;
-          <button onClick={handleClick}>View</button>
-        </p>
+      <div className='blog'>
+        {blog.title}, {blog.author}
+        &nbsp;
+        <button className='show-button' onClick={handleClick}>View</button>
       </div>
     )
   }
@@ -48,26 +46,26 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
     //if user logged in matches the user who posted the blog, show delete button
     if (username === blog.user[0].username) {
       return (
-        <div className='blog-field'>
+        <div className='blog'>
           Title: {blog.title} <br />
           Author: {blog.author} <br />
           URL: {blog.url} <br />
-          Likes: {blog.likes} <button onClick={update}>Like</button> <br />
+          Likes: {blog.likes} <button className='like-button' onClick={update}>Like</button> <br />
           User: {blog.user[0].name} <br />
-          <button onClick={handleClick}>Hide</button>
-          <button onClick={remove}>Delete</button>
+          <button className='hide-button' onClick={handleClick}>Hide</button>
+          <button className='delete-button' onClick={remove}>Delete</button>
         </div>
       )
     }
     //else dont show the delete button
     return (
-      <div className='blog-field'>
+      <div className='blog'>
         Title: {blog.title} <br />
         Author: {blog.author} <br />
         URL: {blog.url} <br />
-        Likes: {blog.likes} <button onClick={update}>Like</button> <br />
+        Likes: {blog.likes} <button className='like-button' onClick={update}>Like</button> <br />
         User: {blog.user[0].name} <br />
-        <button onClick={handleClick}>Hide</button>
+        <button className='hide-button' onClick={handleClick}>Hide</button>
       </div>
     )
   }

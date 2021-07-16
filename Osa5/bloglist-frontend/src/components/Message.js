@@ -6,7 +6,7 @@ const Message = ({ message, style }) => {
   }
 
   return (
-    <p className='message' style={style}>
+    <p id='message' style={style}>
       {message}
     </p>
   )

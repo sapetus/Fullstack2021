@@ -20,7 +20,7 @@ const App = () => {
   const blogFormRef = useRef()
 
   const successStyle = {
-    color: 'green',
+    color: 'rgb(0, 128, 0)',
     backgroundColor: 'darkgrey',
     fontSize: 25,
     borderStyle: 'solid',
