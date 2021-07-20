@@ -32,4 +32,25 @@ describe('anecdoteReducer', () => {
       votes: 1
     })
   })
+
+  test('CREATE action creates a new anecdote', () => {
+    const action = {
+      type: 'CREATE',
+      data: {
+        content: 'An Anecdote',
+        id: 3,
+        votes: 0
+      }
+    }
+    const state = initialState
+    deepFreeze(state)
+
+    const newState = anecdoteReducer(state, action)
+    expect(newState.length).toEqual(state.length + 1)
+    expect(newState).toContainEqual({
+      content: 'An Anecdote',
+      id: 3,
+      votes: 0
+    })
+  })
 })
