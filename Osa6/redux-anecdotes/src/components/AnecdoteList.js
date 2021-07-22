@@ -1,8 +1,22 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { voteAnecdote } from '../reducers/anecdoteReducer'
+import { changeNotification } from '../reducers/notificationReducer'
+import { hideNotification } from '../reducers/notificationReducer'
 
 const Anecdote = ({ anecdote, handleClick }) => {
+  const dispatch = useDispatch()
+
+  const onVote = () => {
+    handleClick()
+
+    dispatch(changeNotification(`You voted '` + anecdote.content + `'`))
+
+    setTimeout(() => {
+      dispatch(hideNotification())
+    }, 5000)
+  }
+
   return (
     <div className='anecdote'>
       <div className='content'>
@@ -10,7 +24,9 @@ const Anecdote = ({ anecdote, handleClick }) => {
       </div>
       <div className='votes'>
         has {anecdote.votes}
-        <button className='vote-button' onClick={handleClick}>vote</button>
+        <button className='vote-button' onClick={() => onVote()}>
+          vote
+        </button>
       </div>
     </div>
   )
@@ -18,17 +34,24 @@ const Anecdote = ({ anecdote, handleClick }) => {
 
 const AnecdoteList = () => {
   const dispatch = useDispatch()
-  const anecdotes = useSelector(state => state)
+  const anecdotes = useSelector(state => state.anecdotes)
+  const filter = useSelector(state => state.filter)
 
-  const orderedListOfAnecdotes = anecdotes.sort(
+  const orderedAnecdotes = anecdotes.sort(
     (a, b) => (a.votes > b.votes) ? -1 : 1
+  )
+
+  const filteredAndOrderedAnecdotes = orderedAnecdotes.filter(anecdote =>
+    anecdote
+      .content
+      .toLowerCase()
+      .includes(filter.toLowerCase())
   )
 
   return (
     <div>
-      <h2>Anecdotes</h2>
       <ul>
-        {orderedListOfAnecdotes.map(anecdote =>
+        {filteredAndOrderedAnecdotes.map(anecdote =>
           <Anecdote
             key={anecdote.id}
             anecdote={anecdote}
