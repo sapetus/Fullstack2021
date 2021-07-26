@@ -1,3 +1,5 @@
+let timeoutID = 0;
+
 const reducer = (state = null, action) => {
   switch (action.type) {
     case 'CHANGE:NOTIFICATION':
@@ -10,13 +12,15 @@ const reducer = (state = null, action) => {
 }
 
 export const setNotification = (notification, delay) => {
+  clearTimeout(timeoutID)
+
   return async dispatch => {
     dispatch({
       type: 'CHANGE:NOTIFICATION',
       data: notification
     })
 
-    setTimeout(() => dispatch({
+    timeoutID = setTimeout(() => dispatch({
       type: 'HIDE'
     }), delay * 1000)
   }
