@@ -6,6 +6,7 @@ import {
   useRouteMatch,
   useHistory
 } from 'react-router-dom'
+import { useField } from './hooks/index'
 
 let notificationID = null;
 
@@ -53,9 +54,10 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  //using the object rest spread, assign a new variabnle for resetValue function
+  const { resetValue: resetContent, ...content } = useField('text')
+  const { resetValue: resetAuthor, ...author } = useField('text')
+  const { resetValue: resetInfo, ...info } = useField('text')
   const history = useHistory()
 
   const handleSubmit = (e) => {
@@ -66,15 +68,15 @@ const CreateNew = (props) => {
     }
 
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
     })
 
     history.push('/')
 
-    props.setNotification(`A new anecdote '${content}' created!`)
+    props.setNotification(`A new anecdote '${content.value}' created!`)
     notificationID = setTimeout(() => {
       props.setNotification(null)
     }, 10000)
@@ -85,18 +87,22 @@ const CreateNew = (props) => {
       <h2>create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          content <input {...content} />
         </div>
         <div>
-          author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          author <input {...author} />
         </div>
         <div>
-          url for more info
-          <input name='info' value={info} onChange={(e) => setInfo(e.target.value)} />
+          url for more info <input {...info} />
         </div>
-        <button>create</button>
+        <button type='submit'>Create</button>
+        <button type='button' onClick={() => {
+          resetContent()
+          resetAuthor()
+          resetInfo()
+        }}>
+          Clear
+        </button>
       </form>
     </div>
   )
