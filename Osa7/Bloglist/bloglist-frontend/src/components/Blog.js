@@ -1,8 +1,12 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
+import { removeBlog, voteBlog } from '../reducers/blogReducer'
+import { setMessage } from '../reducers/messageReducer'
 
-const Blog = ({ blog, updateBlog, removeBlog, username }) => {
+const Blog = ({ blog, username }) => {
   const [visible, setVisible] = useState(false)
+  const dispatch = useDispatch()
 
   const handleClick = () => {
     setVisible(!visible)
@@ -10,25 +14,22 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
 
   const update = (event) => {
     event.preventDefault()
+    const blogObject = { ...blog, likes: blog.likes + 1, user: blog.user[0].id }
 
-    const blogObject = {
-      user: blog.user[0].id,
-      likes: blog.likes + 1,
-      author: blog.author,
-      title: blog.title,
-      url: blog.url
-    }
-
-    updateBlog(blogObject, blog.id)
+    dispatch(voteBlog(blogObject, blog.id))
   }
 
+  //currently, this only works for the blog user created in that ?session?
+  //if blog is liked, or user refreshes the page, the blog cannot be deleted by the user anymore
+  //but the function itself works fine, problem is in the implementation of the user storage
   const remove = (event) => {
     event.preventDefault()
 
     const confirm = window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)
 
     if (confirm) {
-      removeBlog(blog.id)
+      dispatch(removeBlog(blog.id))
+      dispatch(setMessage('Blog has been deleted', 5))
     }
   }
 
@@ -72,10 +73,7 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
 }
 
 Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  updateBlog: PropTypes.func.isRequired,
-  removeBlog: PropTypes.func.isRequired,
-  username: PropTypes.string.isRequired
+  blog: PropTypes.object.isRequired
 }
 
 export default Blog

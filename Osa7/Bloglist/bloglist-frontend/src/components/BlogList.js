@@ -1,13 +1,10 @@
 /* eslint-disable */
 
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { setMessage } from '../reducers/messageReducer'
-import blogService from '../services/blogs'
+import { useSelector } from 'react-redux'
 import Blog from './Blog'
 
 const BlogList = () => {
-  const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
 
   //sort blogs in to descending order
@@ -29,24 +26,6 @@ const BlogList = () => {
     return blogs
   }
 
-  const updateBlog = async (blogObject, id) => {
-    await blogService.update(blogObject, id)
-
-    //update the list of blogs
-    const blogsInDb = await blogService.getAll()
-    setBlogs(sortBlogs(blogsInDb))
-  }
-
-  const removeBlog = async (id) => {
-    await blogService.remove(id)
-
-    //update the list of blogs
-    const blogsInDb = await blogService.getAll()
-    setBlogs(sortBlogs(blogsInDb))
-
-    setMessage('Blog has been deleted', 5)
-  }
-
   const sortedBlogs = sortBlogs(blogs)
 
   return (
@@ -55,8 +34,6 @@ const BlogList = () => {
         <Blog
           key={blog.id}
           blog={blog}
-          updateBlog={updateBlog}
-          removeBlog={removeBlog}
         />
       )}
     </div>

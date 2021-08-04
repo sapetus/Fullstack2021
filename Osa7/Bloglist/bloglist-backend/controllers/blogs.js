@@ -2,6 +2,7 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog.js')
 const User = require('../models/user.js')
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 
 //get all blogs
 blogsRouter.get('/', async (request, response) => {
@@ -59,11 +60,12 @@ blogsRouter.delete('/:id', async (request, response) => {
 //update a specific blog
 blogsRouter.put('/:id', async (request, response) => {
     //get body of the request
+    const id = mongoose.Types.ObjectId(request.params.id)
     const requestBody = request.body
     const blogUpdate = { ...requestBody }
 
-    //the blog to be updated
-    const blogToUpdate = await Blog.findById(request.params.id)
+    //the blog to be updated (does something only if editing is allowed for the user who created the blog)
+    const blogToUpdate = await Blog.findById(id)
 
     //check that the token is valid
     if (!request.token || !request.user) {
@@ -72,13 +74,13 @@ blogsRouter.put('/:id', async (request, response) => {
 
     //the update itself
     try {
-        await Blog.findByIdAndUpdate(request.params.id, blogUpdate, { new: true })
-        response.status(200).end()
+        const data = await Blog.findByIdAndUpdate(id, blogUpdate, { new: true })
+        response.json(data).status(200).end()
     } catch (err) {
         response.json({ error: err.message })
     }
 
-    //to allow updating only by the user who created the blog, uncomment this
+    ///////////////////////////////////////////////////////to allow updating only by the user who created the blog, uncomment this
     // //check that token id is the same as blogs user id
     // if (blogToUpdate.user.toString() === request.user) {
     //     try {

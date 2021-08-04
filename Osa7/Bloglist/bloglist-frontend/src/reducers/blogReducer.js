@@ -5,19 +5,30 @@ const reducer = (state = [], action) => {
   case 'VOTE': {
     const id = action.data.id
     const newState = state.filter(blog => blog.id !== id)
-    return [...newState, action.data]
+    return [...newState, action.data.blog]
   }
   case 'CREATE':
     return [...state, action.data]
   case 'REMOVE': {
-    const id = action.data.id
-    const newState = state.filter(blog => blog.id === id)
+    const id = action.data
+    const newState = state.filter(blog => blog.id !== id)
     return newState
   }
   case 'INIT:BLOGS':
     return action.data
   default:
     return state
+  }
+}
+
+export const voteBlog = (blogObject, id) => {
+  return async dispatch => {
+    await blogService.update(blogObject, id)
+    const blogs = await blogService.getAll()
+    dispatch({
+      type: 'INIT:BLOGS',
+      data: blogs
+    })
   }
 }
 
