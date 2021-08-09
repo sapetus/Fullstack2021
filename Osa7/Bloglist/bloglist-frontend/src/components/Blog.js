@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { removeBlog, voteBlog } from '../reducers/blogReducer'
 import { setMessage } from '../reducers/messageReducer'
 
-const Blog = ({ blog, username }) => {
+const Blog = ({ blog }) => {
   const [visible, setVisible] = useState(false)
   const dispatch = useDispatch()
+  const user = useSelector(state => state.user)
 
   const handleClick = () => {
     setVisible(!visible)
@@ -19,9 +20,6 @@ const Blog = ({ blog, username }) => {
     dispatch(voteBlog(blogObject, blog.id))
   }
 
-  //currently, this only works for the blog user created in that ?session?
-  //if blog is liked, or user refreshes the page, the blog cannot be deleted by the user anymore
-  //but the function itself works fine, problem is in the implementation of the user storage
   const remove = (event) => {
     event.preventDefault()
 
@@ -45,7 +43,7 @@ const Blog = ({ blog, username }) => {
 
   if (visible) {
     //if user logged in matches the user who posted the blog, show delete button
-    if (username === blog.user[0].username) {
+    if (user.username === blog.user[0].username) {
       return (
         <div className='blog'>
           Title: {blog.title} <br />
