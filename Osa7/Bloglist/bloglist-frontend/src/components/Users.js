@@ -1,19 +1,19 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 const Users = () => {
   //get all of the blogs in store
   const blogs = useSelector(state => state.blogs)
-  //get users in blogs
-  const users = blogs.map(blog => blog.user[0])
-  //get unique users
-  const uniqueUsers = [...new Map(users.map(user => [user.id, user])).values()]
+  //get users
+  const uniqueUsers = useSelector(state => state.users)
 
   //create an array with objects consisting of username and amount of blogs
   const usersWithBlogs = new Array()
   uniqueUsers.map(user =>
     usersWithBlogs.push({
       username: user.username,
+      id: user.id,
       blogs: 0
     })
   )
@@ -48,8 +48,12 @@ const Users = () => {
             <th style={style}>blogs created</th>
           </tr>
           {usersWithBlogs.map(object =>
-            <tr key={object.username}>
-              <td style={style}>{object.username}</td>
+            <tr key={object.id}>
+              <td style={style}>
+                <Link to={`/users/${object.id}`}>
+                  {object.username}
+                </Link>
+              </td>
               <td style={style}>{object.blogs}</td>
             </tr>
           )}

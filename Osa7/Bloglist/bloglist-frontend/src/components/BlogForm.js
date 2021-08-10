@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { createBlog } from '../reducers/blogReducer'
+import { createBlog, initializeBlogs } from '../reducers/blogReducer'
 import { setMessage } from '../reducers/messageReducer'
 
 const BlogForm = () => {
@@ -32,6 +32,7 @@ const BlogForm = () => {
     }
 
     dispatch(createBlog(blogObject))
+    dispatch(initializeBlogs())
     dispatch(setMessage('A new blog \'' + blogObject.title + '\' by ' + blogObject.author + ' has been added', 5))
 
     setNewTitle('')

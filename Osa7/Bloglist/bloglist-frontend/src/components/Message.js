@@ -18,9 +18,11 @@ const Message = () => {
   }
 
   return (
-    <p id='message' style={style}>
-      {message}
-    </p>
+    <div>
+      <p id='message' style={style}>
+        {message}
+      </p>
+    </div>
   )
 }
 
