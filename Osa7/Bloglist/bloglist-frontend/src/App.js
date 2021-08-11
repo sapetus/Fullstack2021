@@ -10,6 +10,7 @@ import BlogForm from './components/BlogForm'
 import Message from './components/Message'
 import Togglable from './components/Togglable'
 import BlogList from './components/BlogList'
+import Blog from './components/Blog'
 import Users from './components/Users'
 import User from './components/User'
 
@@ -38,10 +39,16 @@ const App = () => {
 
   const currentUser = useSelector(state => state.user)
   const users = useSelector(state => state.users)
+  const blogs = useSelector(state => state.blogs)
 
-  const match = useRouteMatch('/users/:id')
-  const user = match
-    ? users.find(user => user.id === match.params.id)
+  const userMatch = useRouteMatch('/users/:id')
+  const user = userMatch
+    ? users.find(user => user.id === userMatch.params.id)
+    : null
+
+  const blogMatch = useRouteMatch('/blogs/:id')
+  const blog = blogMatch
+    ? blogs.find(blog => blog.id === blogMatch.params.id)
     : null
 
   const handleLogout = (event) => {
@@ -74,22 +81,21 @@ const App = () => {
       <div id='navbar'>
         <Link style={style} to='/'>HOME</Link>
         <Link style={style} to='/users'>USERS</Link>
+        {currentUser.username} has logged in &nbsp;
+        <button onClick={handleLogout}>
+          logout
+        </button>
       </div>
 
       <h2>Blog App</h2>
 
       <Message />
 
-      <div id='user'>
-        <p>
-          {currentUser.username} has logged in <br />
-          <button onClick={handleLogout}>
-            logout
-          </button>
-        </p>
-      </div>
-
       <Switch>
+        <Route path='/blogs/:id'>
+          <Blog blog={blog} />
+        </Route>
+
         <Route path='/users/:id'>
           <User user={user} />
         </Route>
@@ -106,7 +112,7 @@ const App = () => {
           <BlogList />
         </Route>
       </Switch>
-    </div>
+    </div >
   )
 }
 

@@ -1,17 +1,18 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { removeBlog, voteBlog } from '../reducers/blogReducer'
 import { setMessage } from '../reducers/messageReducer'
+import { useHistory } from 'react-router'
 
 const Blog = ({ blog }) => {
-  const [visible, setVisible] = useState(false)
-  const dispatch = useDispatch()
-  const user = useSelector(state => state.user)
-
-  const handleClick = () => {
-    setVisible(!visible)
+  if (!blog) {
+    return null
   }
+
+  const dispatch = useDispatch()
+  const history = useHistory()
+  const user = useSelector(state => state.user)
 
   const update = (event) => {
     event.preventDefault()
@@ -28,34 +29,22 @@ const Blog = ({ blog }) => {
     if (confirm) {
       dispatch(removeBlog(blog.id))
       dispatch(setMessage('Blog has been deleted', 5))
+      history.push('/')
     }
   }
 
-  if (!visible) {
-    return (
-      <div className='blog'>
-        {blog.title}, {blog.author}
-        &nbsp;
-        <button className='show-button' onClick={handleClick}>View</button>
-      </div>
-    )
-  }
+  return (
+    <div>
+      <h2>{blog.title} by {blog.author}</h2>
+      <a href={blog.url}>{blog.url}</a> <br />
+      Likes: {blog.likes} <button className='like-button' onClick={update}>Like</button> <br />
+      Added by {blog.user[0].name} <br />
+      {user.username === blog.user[0].username
+        ? <button className='delete-button' onClick={remove}>Delete</button>
+        : null}
+    </div>
+  )
 
-  if (visible) {
-    return (
-      <div className='blog'>
-        Title: {blog.title} <br />
-        Author: {blog.author} <br />
-        URL: {blog.url} <br />
-        Likes: {blog.likes} <button className='like-button' onClick={update}>Like</button> <br />
-        User: {blog.user[0].name} <br />
-        <button className='hide-button' onClick={handleClick}>Hide</button>
-        {user.username === blog.user[0].username
-          ? <button className='delete-button' onClick={remove}>Delete</button>
-          : null}
-      </div>
-    )
-  }
 }
 
 Blog.propTypes = {

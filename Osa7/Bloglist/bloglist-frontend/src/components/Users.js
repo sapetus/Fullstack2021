@@ -31,30 +31,23 @@ const Users = () => {
     })
   })
 
-  const style = {
-    padding: 8,
-    textAlign: 'left',
-    borderStyle: 'solid',
-    borderWidth: 1
-  }
-
   return (
     <div>
       <h2>Users</h2>
-      <table style={{ borderCollapse: 'collapse' }}>
+      <table>
         <tbody>
           <tr>
-            <th style={style}>user</th>
-            <th style={style}>blogs created</th>
+            <th>user</th>
+            <th>blogs created</th>
           </tr>
           {usersWithBlogs.map(object =>
             <tr key={object.id}>
-              <td style={style}>
+              <td >
                 <Link to={`/users/${object.id}`}>
                   {object.username}
                 </Link>
               </td>
-              <td style={style}>{object.blogs}</td>
+              <td>{object.blogs}</td>
             </tr>
           )}
         </tbody>

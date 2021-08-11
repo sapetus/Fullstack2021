@@ -32,8 +32,8 @@ const BlogForm = () => {
     }
 
     dispatch(createBlog(blogObject))
-    dispatch(initializeBlogs())
     dispatch(setMessage('A new blog \'' + blogObject.title + '\' by ' + blogObject.author + ' has been added', 5))
+    dispatch(initializeBlogs())
 
     setNewTitle('')
     setNewAuthor('')
