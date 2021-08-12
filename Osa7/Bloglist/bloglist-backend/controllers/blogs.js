@@ -1,7 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog.js')
 const User = require('../models/user.js')
-const jwt = require('jsonwebtoken')
+const Comment = require('../models/comment.js')
 const mongoose = require('mongoose')
 
 //get all blogs
@@ -11,6 +11,13 @@ blogsRouter.get('/', async (request, response) => {
         .populate('user', { username: 1, name: 1 })
 
     response.json(blogs)
+})
+
+//get specific blog
+blogsRouter.get('/:id', async (request, response) => {
+    const blog = await Blog.findById(request.params.id).populate('user', { username: 1, name: 1 })
+
+    response.json(blog)
 })
 
 //post a new blog
@@ -92,6 +99,31 @@ blogsRouter.put('/:id', async (request, response) => {
     // } else {
     //     response.status(401).json({ error: 'token is invalid' })
     // }
+})
+
+
+///////// these two work, but would propably need their own controller
+//post a new comment for a blog
+blogsRouter.post('/:id/comments', async (request, response) => {
+    const comment = new Comment(request.body)
+
+    const blog = await Blog.findById(request.params.id)
+    comment.blog = blog._id
+
+    await comment.save()
+    try {
+        response.status(201).json(comment.toJSON())
+    }
+    catch (error) {
+        response.status(401).json(error.message)
+    }
+})
+
+//get comments associated with blog (This is just stupid)
+blogsRouter.get('/:id/comments', async (request, response) => {
+    const comments = await Comment.find({}).populate('blog', { title: 1, author: 1 })
+
+    response.json(comments)
 })
 
 module.exports = blogsRouter

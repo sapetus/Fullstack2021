@@ -38,4 +38,9 @@ const remove = async (id) => {
   return response.data
 }
 
-export default { getAll, create, update, remove, setToken }
+const getComments = async (id) => {
+  const request = axios.get(`${baseUrl}/${id}/comments`)
+  return request.then(response => response.data)
+}
+
+export default { getAll, create, update, remove, setToken, getComments }

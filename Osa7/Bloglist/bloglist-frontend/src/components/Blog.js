@@ -1,16 +1,16 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { removeBlog, voteBlog } from '../reducers/blogReducer'
 import { setMessage } from '../reducers/messageReducer'
 import { useHistory } from 'react-router'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, comments }) => {
   if (!blog) {
     return null
   }
 
   const dispatch = useDispatch()
+
   const history = useHistory()
   const user = useSelector(state => state.user)
 
@@ -42,13 +42,15 @@ const Blog = ({ blog }) => {
       {user.username === blog.user[0].username
         ? <button className='delete-button' onClick={remove}>Delete</button>
         : null}
+      <h2>Comments</h2>
+      {comments.map(comment =>
+        <li key={comment.id}>
+          {comment.comment}
+        </li>
+      )}
     </div>
   )
 
-}
-
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired
 }
 
 export default Blog

@@ -34,7 +34,7 @@ const loginForm = () => {
   return (
     <form id='login-form' onSubmit={handleLogin} >
       <div>
-        username
+        username &nbsp;
         <input
           id='username'
           type='text'
@@ -44,7 +44,7 @@ const loginForm = () => {
         />
       </div>
       <div>
-        password
+        password &nbsp;
         <input
           id='password'
           type='password'

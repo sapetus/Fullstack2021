@@ -17,6 +17,7 @@ import User from './components/User'
 import { initializeBlogs } from './reducers/blogReducer'
 import { initializeUser, clearUser } from './reducers/userReducer'
 import { initializeUsers } from './reducers/usersReducer'
+import { initializeComments } from './reducers/commentsReducer'
 
 const App = () => {
   const blogFormRef = useRef()
@@ -37,9 +38,15 @@ const App = () => {
     dispatch(initializeUsers())
   }, [dispatch])
 
+  //effect hook for getting comments from storage
+  useEffect(() => {
+    dispatch(initializeComments())
+  })
+
   const currentUser = useSelector(state => state.user)
   const users = useSelector(state => state.users)
   const blogs = useSelector(state => state.blogs)
+  const comments = useSelector(state => state.comments)
 
   const userMatch = useRouteMatch('/users/:id')
   const user = userMatch
@@ -49,6 +56,9 @@ const App = () => {
   const blogMatch = useRouteMatch('/blogs/:id')
   const blog = blogMatch
     ? blogs.find(blog => blog.id === blogMatch.params.id)
+    : null
+  const filteredComments = blogMatch
+    ? comments.filter(comment => comment.blog[0].id === blogMatch.params.id)
     : null
 
   const handleLogout = (event) => {
@@ -93,7 +103,7 @@ const App = () => {
 
       <Switch>
         <Route path='/blogs/:id'>
-          <Blog blog={blog} />
+          <Blog blog={blog} comments={filteredComments}/>
         </Route>
 
         <Route path='/users/:id'>
