@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { removeBlog, voteBlog } from '../reducers/blogReducer'
 import { setMessage } from '../reducers/messageReducer'
 import { useHistory } from 'react-router'
+import CommentForm from './CommentForm'
 
 const Blog = ({ blog, comments }) => {
   if (!blog) {
@@ -43,11 +44,14 @@ const Blog = ({ blog, comments }) => {
         ? <button className='delete-button' onClick={remove}>Delete</button>
         : null}
       <h2>Comments</h2>
-      {comments.map(comment =>
-        <li key={comment.id}>
-          {comment.comment}
-        </li>
-      )}
+      <CommentForm blogId={blog.id}/> <br/>
+      <div id='comment-list'>
+        {comments.map(comment =>
+          <li key={comment.id}>
+            {comment.comment}
+          </li>
+        )}
+      </div>
     </div>
   )
 

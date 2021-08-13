@@ -41,7 +41,7 @@ const App = () => {
   //effect hook for getting comments from storage
   useEffect(() => {
     dispatch(initializeComments())
-  })
+  }, [dispatch])
 
   const currentUser = useSelector(state => state.user)
   const users = useSelector(state => state.users)
@@ -103,7 +103,7 @@ const App = () => {
 
       <Switch>
         <Route path='/blogs/:id'>
-          <Blog blog={blog} comments={filteredComments}/>
+          <Blog blog={blog} comments={filteredComments} />
         </Route>
 
         <Route path='/users/:id'>
