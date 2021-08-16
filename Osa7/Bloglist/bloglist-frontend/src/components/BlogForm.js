@@ -4,6 +4,12 @@ import { useDispatch } from 'react-redux'
 import { createBlog, initializeBlogs } from '../reducers/blogReducer'
 import { setMessage } from '../reducers/messageReducer'
 
+import {
+  TextField,
+  Button,
+  Typography
+} from '@material-ui/core'
+
 const BlogForm = () => {
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
@@ -42,33 +48,20 @@ const BlogForm = () => {
 
   return (
     <div>
-      <h2>Add a new Blog</h2>
+      <Typography variant='h4' component='h4'>Add a New Blog</Typography>
       <form id='blog-form' onSubmit={addBlog}>
-        Title:
-        <input
-          id='title'
-          type='text'
-          value={newTitle}
-          onChange={handleTitleChange}
-        />
-        <br />
-        Author:
-        <input
-          id='author'
-          type='text'
-          value={newAuthor}
-          onChange={handleAuthorChange}
-        />
-        <br />
-        URL:
-        <input
-          id='url'
-          type='text'
-          value={newUrl}
-          onChange={handleUrlChange}
-        />
-        <br />
-        <button id='create-button' type='submit'>create</button>
+        <div>
+          <TextField label='Title' onChange={handleTitleChange} value={newTitle} />
+        </div>
+        <div>
+          <TextField label='Author' onChange={handleAuthorChange} value={newAuthor}/>
+        </div>
+        <div>
+          <TextField label='URL' onChange={handleUrlChange} value={newUrl}/>
+        </div>
+        <Button variant='contained' color='primary' type='submit'>
+          Create
+        </Button>
       </form>
     </div>
   )

@@ -1,6 +1,13 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import {
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography
+} from '@material-ui/core'
 
 const BlogList = () => {
   const blogs = useSelector(state => state.blogs)
@@ -27,12 +34,24 @@ const BlogList = () => {
   const sortedBlogs = sortBlogs(blogs)
 
   return (
-    <div id='blog_list'>
-      {sortedBlogs.map(blog =>
-        <Link key={blog.id} to={`/blogs/${blog.id}`}>
-          <p className='blog'>{blog.title} by {blog.author}</p>
-        </Link>
-      )}
+    <div>
+      <Typography variant='h4' component='h4'>Blogs</Typography>
+      <Table>
+        <TableBody>
+          {sortedBlogs.map(blog =>
+            <TableRow key={blog.id}>
+              <TableCell>
+                <Link to={`/blogs/${blog.id}`}>
+                  {blog.title}
+                </Link>
+              </TableCell>
+              <TableCell>
+                {blog.author}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   )
 }

@@ -1,6 +1,14 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+  Typography
+} from '@material-ui/core'
 
 const Users = () => {
   //get all of the blogs in store
@@ -33,25 +41,31 @@ const Users = () => {
 
   return (
     <div>
-      <h2>Users</h2>
-      <table>
-        <tbody>
-          <tr>
-            <th>user</th>
-            <th>blogs created</th>
-          </tr>
-          {usersWithBlogs.map(object =>
-            <tr key={object.id}>
-              <td >
-                <Link to={`/users/${object.id}`}>
-                  {object.username}
-                </Link>
-              </td>
-              <td>{object.blogs}</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <Typography variant='h4' component='h4' gutterBottom>Users</Typography>
+      <Table>
+        <TableBody>
+          <TableHead>
+            <TableCell>
+              USER
+            </TableCell>
+            <TableCell>
+              BLOGS CREATED
+            </TableCell>
+            {usersWithBlogs.map(object =>
+              <TableRow key={object.id}>
+                <TableCell>
+                  <Link to={`/users/${object.id}`}>
+                    {object.username}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  {object.blogs}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableHead>
+        </TableBody>
+      </Table>
     </div>
   )
 }

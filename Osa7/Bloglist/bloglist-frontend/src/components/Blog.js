@@ -4,6 +4,19 @@ import { removeBlog, voteBlog } from '../reducers/blogReducer'
 import { setMessage } from '../reducers/messageReducer'
 import { useHistory } from 'react-router'
 import CommentForm from './CommentForm'
+import {
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Button,
+  Typography
+} from '@material-ui/core'
+import ArrowRightIcon from '@material-ui/icons/ArrowRight'
 
 const Blog = ({ blog, comments }) => {
   if (!blog) {
@@ -36,22 +49,53 @@ const Blog = ({ blog, comments }) => {
 
   return (
     <div>
-      <h2>{blog.title} by {blog.author}</h2>
-      <a href={blog.url}>{blog.url}</a> <br />
-      Likes: {blog.likes} <button className='like-button' onClick={update}>Like</button> <br />
-      Added by {blog.user[0].name} <br />
+      <Typography variant='h4' component='h4'>{blog.title} by {blog.author}</Typography>
       {user.username === blog.user[0].username
-        ? <button className='delete-button' onClick={remove}>Delete</button>
+        ? <Button variant='contained' color='secondary' onClick={remove}>Delete</Button>
         : null}
-      <h2>Comments</h2>
-      <CommentForm blogId={blog.id}/> <br/>
-      <div id='comment-list'>
+      <Table style={{ marginBottom: '1em' }}>
+        <TableBody>
+          <TableRow>
+            <TableCell>
+              ADDRESS
+            </TableCell>
+            <TableCell>
+              <a href={blog.url}>{blog.url}</a>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>
+              LIKES
+            </TableCell>
+            <TableCell>
+              {blog.likes} &nbsp;
+              <Button variant='contained' color='primary' onClick={update}>
+                LIKE
+              </Button>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>
+              ADDED BY
+            </TableCell>
+            <TableCell>
+              {blog.user[0].name}
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+      <Typography variant='h4' component='h4'>Comments</Typography>
+      <CommentForm blogId={blog.id} />
+      <List component='nav'>
         {comments.map(comment =>
-          <li key={comment.id}>
-            {comment.comment}
-          </li>
+          <ListItem key={comment.id}>
+            <ListItemIcon>
+              <ArrowRightIcon />
+            </ListItemIcon>
+            <ListItemText primary={comment.comment} />
+          </ListItem>
         )}
-      </div>
+      </List>
     </div>
   )
 

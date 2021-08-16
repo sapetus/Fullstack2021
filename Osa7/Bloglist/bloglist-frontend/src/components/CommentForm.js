@@ -3,6 +3,11 @@ import { useDispatch } from 'react-redux'
 import { createComment, initializeComments } from '../reducers/commentsReducer'
 import { useHistory } from 'react-router'
 
+import {
+  TextField,
+  Button
+} from '@material-ui/core'
+
 const CommentForm = (blogId) => {
   const [comment, setComment] = useState('')
 
@@ -33,13 +38,12 @@ const CommentForm = (blogId) => {
   return (
     <div>
       <form id='comment-form' onSubmit={addComment}>
-        <input
-          id='comment'
-          type='text'
-          value={comment}
-          onChange={handleCommentChange}
-        />
-        <button type='submit'>add comment</button>
+        <div>
+          <TextField label='comment' value={comment} onChange={handleCommentChange} />
+        </div>
+        <Button variant='contained' color='primary' type='submit'>
+          Add Comment
+        </Button>
       </form>
     </div>
   )
