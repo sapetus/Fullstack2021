@@ -7,6 +7,9 @@ const Authors = (props) => {
   const [year, setYear] = useState('')
 
   const [changeBirthyear] = useMutation(UPDATE_AUTHOR, {
+    onError: (error) => {
+      props.setError(error.graphQLErrors[0].message)
+    },
     refetchQueries: [{ query: ALL_AUTHORS }]
   })
 
@@ -18,6 +21,10 @@ const Authors = (props) => {
 
   const authors = result.loading ? [] : result.data.allAuthors
 
+  /*
+  after updating author, the next update on the same author 
+  doesn't happen, but the one after that does, weird...
+  */
   const submit = async (event) => {
     event.preventDefault()
 
@@ -52,28 +59,31 @@ const Authors = (props) => {
             )}
           </tbody>
         </table>}
-      <div>
-        <h2>Set Birthyear</h2>
-        <form onSubmit={submit}>
-          <div>
-            name
-            <select onChange={({ target }) => setName(target.value)}>
-              {authors.map(author =>
-                <option key={author.id} value={author.name}>{author.name}</option>
-              )}
-            </select>
-          </div>
-          <div>
-            born
-            <input
-              type='number'
-              value={year}
-              onChange={({ target }) => setYear(parseInt(target.value))}
-            />
-          </div>
-          <button type='submit'>Update Author</button>
-        </form>
-      </div>
+      {props.loggedIn
+        ? <div>
+          <h2>Set Birthyear</h2>
+          <form onSubmit={submit}>
+            <div>
+              name
+              <select onChange={({ target }) => setName(target.value)}>
+                {authors.map(author =>
+                  <option key={author.id} value={author.name}>{author.name}</option>
+                )}
+              </select>
+            </div>
+            <div>
+              born
+              <input
+                type='number'
+                value={year}
+                onChange={({ target }) => setYear(parseInt(target.value))}
+              />
+            </div>
+            <button type='submit'>Update Author</button>
+          </form>
+        </div>
+        : null
+      }
     </div>
   )
 }
