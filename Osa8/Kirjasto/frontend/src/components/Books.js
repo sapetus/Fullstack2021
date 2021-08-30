@@ -1,39 +1,55 @@
-import React, { useState } from 'react'
-import { useQuery } from '@apollo/client'
-import { ALL_BOOKS_NO_FILTER } from '../queries'
+import React, { useEffect, useState } from 'react'
+import { useLazyQuery } from '@apollo/client'
+import { ALL_BOOKS_FILTER, ALL_BOOKS_NO_FILTER } from '../queries'
 
 const Books = (props) => {
   const [filter, setFilter] = useState(null)
+  const [genres, setGenres] = useState([])
 
-  const result = useQuery(ALL_BOOKS_NO_FILTER)
+  const [getAllBooks, { loading, data: allBooksData }] = useLazyQuery(ALL_BOOKS_NO_FILTER, {
+    fetchPolicy: 'cache-and-network'
+  })
+  const [getBooksFilter, { data: filterBooksData }] = useLazyQuery(ALL_BOOKS_FILTER, {
+    fetchPolicy: 'cache-and-network'
+  })
+
+  useEffect(() => {
+    fetchAllBooks()
+  }, [allBooksData]) //eslint-disable-line
+
+  useEffect(() => {
+    const bookGenres = loading ? [] : allBooksData?.allBooks?.map(book => book.genres)
+    let tempArray = []
+    if (!loading && allBooksData?.allBooks.length > 0) {
+      bookGenres.forEach(genreArray => {
+        genreArray.forEach(genre => {
+          if (!tempArray.includes(genre)) {
+            tempArray = tempArray.concat(genre)
+          }
+        })
+      })
+    }
+    setGenres(tempArray)
+  }, [allBooksData?.allBooks, loading])
+
+  const fetchBooksByGenre = (genre) => {
+    getBooksFilter({ variables: { genre: genre } })
+    setFilter(genre)
+  }
+  const fetchAllBooks = () => {
+    getAllBooks()
+    setFilter(null)
+  }
 
   if (!props.show) {
     return null
-  }
-
-  const books = result.loading ? [] : result.data.allBooks
-  let filteredBooks = books
-  if (filter && !result.loading) {
-    filteredBooks = filteredBooks.filter(book => book.genres.includes(filter))
-  }
-
-  const bookGenres = result.loading ? [] : result.data.allBooks.map(book => book.genres)
-  let genres = []
-  if (!result.loading) {
-    bookGenres.forEach(genreArray => {
-      genreArray.forEach(genre => {
-        if (!genres.includes(genre)) {
-          genres.push(genre)
-        }
-      })
-    })
   }
 
   return (
     <div>
       <h2>books</h2>
 
-      {result.loading
+      {loading
         ? <div>loading...</div>
         : <div>
           {filter ? <p>In genre: <strong>{filter}</strong></p> : null}
@@ -48,19 +64,28 @@ const Books = (props) => {
                   published
                 </th>
               </tr>
-              {filteredBooks.map(a =>
-                <tr key={a.title}>
-                  <td>{a.title}</td>
-                  <td>{a.author.name}</td>
-                  <td>{a.published}</td>
-                </tr>
-              )}
+              {filter === null
+                ? allBooksData?.allBooks?.map(book =>
+                  <tr key={book.title}>
+                    <td>{book.title}</td>
+                    <td>{book.author.name}</td>
+                    <td>{book.published}</td>
+                  </tr>
+                )
+                : filterBooksData?.allBooks?.map(book =>
+                  <tr key={book.title}>
+                    <td>{book.title}</td>
+                    <td>{book.author.name}</td>
+                    <td>{book.published}</td>
+                  </tr>
+                )
+              }
             </tbody>
           </table>
           {genres.map(genre =>
-            <button key={genre} onClick={() => setFilter(genre)}>{genre}</button>
+            <button key={genre} onClick={() => fetchBooksByGenre(genre)}>{genre}</button>
           )}
-          <button onClick={() => setFilter(null)}>No Filter</button>
+          <button onClick={() => fetchAllBooks()}>No Filter</button>
         </div>}
     </div>
   )
