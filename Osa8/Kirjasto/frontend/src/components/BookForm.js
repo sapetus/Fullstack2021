@@ -13,6 +13,9 @@ const BookForm = (props) => {
     onError: (error) => {
       props.setError(error.graphQLErrors[0].message)
     },
+    update: (store, response) => {
+      props.updateCacheWith(response.data.addBook)
+    },
     refetchQueries: [{ query: ALL_AUTHORS }, { query: ALL_BOOKS_NO_FILTER }]
   })
 

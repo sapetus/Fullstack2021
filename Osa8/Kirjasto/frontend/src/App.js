@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, gql, useSubscription } from '@apollo/client'
 
 import Authors from './components/Authors'
 import Books from './components/Books'
@@ -7,13 +7,44 @@ import BookForm from './components/BookForm'
 import LoginForm from './components/LoginForm'
 import Message from './components/Message'
 import Recommended from './components/Recommended'
+import { ALL_BOOKS_NO_FILTER, BOOK_DETAILS } from './queries'
+
+export const BOOK_ADDED = gql`
+  subscription {
+    bookAdded {
+      ...BookDetails
+    }
+  }
+  ${BOOK_DETAILS}
+`
 
 const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [page, setPage] = useState('authors')
   const [token, setToken] = useState(null)
-
   const client = useApolloClient()
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const addedBook = subscriptionData.data.bookAdded
+      updateCacheWith(addedBook)
+      setError(`${addedBook.title} added`)
+    }
+  })
+
+  const updateCacheWith = (addedBook) => {
+    const includedIn = (set, object) =>
+      set.map(book => book.id).includes(object.id)
+
+    const dataInStore = client.readQuery({ query: ALL_BOOKS_NO_FILTER })
+
+    if (!includedIn(dataInStore.allBooks, addedBook)) {
+      client.writeQuery({
+        query: ALL_BOOKS_NO_FILTER,
+        data: { allBooks: dataInStore.allBooks.concat(addedBook) }
+      })
+    }
+  }
 
   const setError = (message) => {
     setErrorMessage(message)
@@ -59,6 +90,7 @@ const App = () => {
       <BookForm
         show={page === 'add'}
         setError={setError}
+        updateCacheWith={updateCacheWith}
       />
       <LoginForm
         show={page === 'login'}
