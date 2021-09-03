@@ -1,30 +1,36 @@
-import React, { useState } from 'react'
-import { useMutation, useQuery } from '@apollo/client'
+import React, { useEffect, useState } from 'react'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { ALL_AUTHORS, UPDATE_AUTHOR } from '../queries'
 
 const Authors = (props) => {
   const [name, setName] = useState('')
   const [year, setYear] = useState('')
+  const [authors, setAuthors] = useState([])
 
-  const [changeBirthyear] = useMutation(UPDATE_AUTHOR, {
+  const [changeBirthyear, { loading: mutationLoading }] = useMutation(UPDATE_AUTHOR, {
     onError: (error) => {
       props.setError(error.graphQLErrors[0].message)
     },
-    refetchQueries: [{ query: ALL_AUTHORS }]
+    refetchQueries: [ALL_AUTHORS, 'allAuthors']
   })
 
-  const result = useQuery(ALL_AUTHORS)
+  const [getAuthors, { loading: authorsLoading, data: authorsData }] = useLazyQuery(ALL_AUTHORS, {
+    fetchPolicy: 'cache-and-network'
+  })
+
+  useEffect(() => {
+    getAuthors()
+  }, [authorsData, mutationLoading]) //eslint-disable-line
+
+  useEffect(() => {
+    const authors = authorsLoading ? [] : authorsData?.allAuthors
+    setAuthors(authors)
+  }, [authorsData?.allAuthors, authorsLoading, mutationLoading]) //eslint-disable-line
 
   if (!props.show) {
     return null
   }
 
-  const authors = result.loading ? [] : result.data.allAuthors
-
-  /*
-  after updating author, the next update on the same author 
-  doesn't happen, but the one after that does, weird...
-  */
   const submit = async (event) => {
     event.preventDefault()
 
@@ -37,7 +43,7 @@ const Authors = (props) => {
   return (
     <div>
       <h2>authors</h2>
-      {result.loading
+      {authorsLoading
         ? <div>loading...</div>
         : <table>
           <tbody>
@@ -50,7 +56,7 @@ const Authors = (props) => {
                 books
               </th>
             </tr>
-            {authors.map(author =>
+            {authors?.map(author =>
               <tr key={author.id}>
                 <td>{author.name}</td>
                 <td>{author.born}</td>
@@ -66,7 +72,7 @@ const Authors = (props) => {
             <div>
               name
               <select onChange={({ target }) => setName(target.value)}>
-                {authors.map(author =>
+                {authors?.map(author =>
                   <option key={author.id} value={author.name}>{author.name}</option>
                 )}
               </select>
