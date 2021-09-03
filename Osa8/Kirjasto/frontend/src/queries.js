@@ -4,7 +4,9 @@ export const AUTHOR_DETAILS = gql`
   fragment AuthorDetails on Author {
     name
     born
-    bookCount
+    books {
+      title
+    }
     id
   }
 `

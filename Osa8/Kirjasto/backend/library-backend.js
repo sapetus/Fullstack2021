@@ -33,7 +33,7 @@ const typeDefs = gql`
     name: String!
     id: ID!
     born: Int
-    bookCount: Int!
+    books: [Book!]!
   }
 
   type Book {
@@ -102,17 +102,16 @@ const resolvers = {
       }
       return filteredBooks
     },
-    allAuthors: () => Author.find({}),
+    allAuthors: async () => {
+      let authors = await Author.find({})
+      let books = await Book.find({}).populate('author')
+
+      authors.map(author => author.books = books.filter(book => book.author.name === author.name))
+
+      return authors
+    },
     me: (root, args, context) => {
       return context.currentUser
-    }
-  },
-  Author: {
-    bookCount: async (root) => {
-      const books = await Book.find({}).populate('author')
-      return (
-        books.filter(book => book.author.name === root.name).length
-      )
     }
   },
   Mutation: {
