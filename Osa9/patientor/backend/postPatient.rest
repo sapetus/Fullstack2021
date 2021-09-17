@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/patients
+Content-Type: application/json
+
+{
+  "name": "Erkki Esimerkki",
+  "dateOfBirth": "1978-05-09",
+  "ssn": "090578-132X",
+  "gender": "male",
+  "occupation": "Industrial Welder"
+}
