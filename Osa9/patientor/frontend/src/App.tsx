@@ -9,8 +9,11 @@ import { Patient } from "./types";
 
 import PatientListPage from "./PatientListPage";
 
+import PatientInfo from "./components/PatientInfo";
+
 const App = () => {
   const [, dispatch] = useStateValue();
+
   React.useEffect(() => {
     void axios.get<void>(`${apiBaseUrl}/ping`);
 
@@ -37,6 +40,9 @@ const App = () => {
           </Button>
           <Divider hidden />
           <Switch>
+            <Route path="/patients/:id">
+              <PatientInfo />
+            </Route>
             <Route path="/">
               <PatientListPage />
             </Route>
