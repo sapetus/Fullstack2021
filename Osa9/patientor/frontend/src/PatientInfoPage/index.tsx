@@ -1,11 +1,12 @@
 import React from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router';
-import { Icon } from "semantic-ui-react";
 
 import { apiBaseUrl } from '../constants';
-import { Patient } from '../types';
+import { Patient, Entry } from '../types';
 import { useStateValue, setViewedPatient } from '../state';
+import GenderIcon from '../components/GenderIcon';
+import EntryItem from '../components/EntryItem';
 
 const PatientInfo = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,9 +28,17 @@ const PatientInfo = () => {
 
   return (
     <div>
-      <h2>{viewedPatient?.name} {viewedPatient?.gender === 'male' ? <Icon name='mars' /> : <Icon name='venus' />}</h2>
-      <p>ssn: {viewedPatient?.ssn}</p>
-      <p>occupation: {viewedPatient?.occupation}</p>
+      <div className="ui segment">
+        <h2>{viewedPatient?.name} <GenderIcon gender={viewedPatient?.gender} /></h2>
+        <p>ssn: {viewedPatient?.ssn}</p>
+        <p>occupation: {viewedPatient?.occupation}</p>
+      </div>
+      <div className="ui segment">
+        <h3>Entries</h3>
+        {viewedPatient?.entries.map((entry: Entry) =>
+          <EntryItem key={entry.id} entry={entry} />
+        )}
+      </div>
     </div>
   );
 };
