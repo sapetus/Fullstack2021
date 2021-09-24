@@ -5,8 +5,8 @@ import { useParams } from 'react-router';
 import { apiBaseUrl } from '../constants';
 import { Patient, Entry } from '../types';
 import { useStateValue, setViewedPatient } from '../state';
-import GenderIcon from '../components/GenderIcon';
-import EntryItem from '../components/EntryItem';
+import GenderIcon from './GenderIcon';
+import EntryItem from './EntryItem';
 
 const PatientInfo = () => {
   const { id } = useParams<{ id: string }>();
