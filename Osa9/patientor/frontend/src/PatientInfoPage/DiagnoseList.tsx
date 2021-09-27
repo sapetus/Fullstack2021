@@ -11,7 +11,7 @@ const DiagnoseList = (props: PropTypes) => {
     <ul>
       {props.diagnosisCodes?.map(code =>
         <li key={code}>
-          <p>{code} | <em>{props.diagnoses[`${code}`].name}</em></p>
+          <p>{code} | <em>{props.diagnoses[`${code}`]?.name}</em></p>
         </li>
       )}
     </ul>

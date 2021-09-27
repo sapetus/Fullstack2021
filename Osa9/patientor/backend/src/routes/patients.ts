@@ -30,7 +30,6 @@ router.get('/:id', (req, res) => {
   }
 });
 
-//type checking the posted entry functions properly (some properties are not yet checked)
 router.post('/:id/entries', (req, res) => {
   const patientToUpdate = patientService.getPatientById(req.params.id);
 

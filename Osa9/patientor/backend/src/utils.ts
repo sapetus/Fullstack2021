@@ -1,7 +1,9 @@
-import { NewPatient, NewEntry, Gender, Diagnose, HealthCheckRating } from "./types";
+import { NewPatient, NewEntry, Gender, HealthCheckRating } from "./types";
 
 type PatientFields = { name: unknown, dateOfBirth: unknown, ssn: unknown, gender: unknown, occupation: unknown };
-type EntryFields = { description: unknown, date: unknown, specialist: unknown, diagnosisCodes: unknown, type: unknown, healthCheckRating: unknown, employerName: unknown, sickLeave: unknown, discharge: unknown };
+type EntryFields = { description: unknown, date: unknown, specialist: unknown, diagnosisCodes?: unknown, type: unknown, healthCheckRating: unknown, employerName: unknown, sickLeave?: unknown, discharge: unknown };
+type SickLeave = { startDate: string, endDate: string };
+type Discharge = { date: string, criteria: string };
 
 const toNewPatient = ({ name, dateOfBirth, ssn, gender, occupation }: PatientFields): NewPatient => {
   const newPatient: NewPatient = {
@@ -22,40 +24,137 @@ const toNewEntry = ({ description, date, specialist, diagnosisCodes, type, healt
 
   switch (parsedType) {
     case "HealthCheck":
-      return {
-        description: parseDescription(description),
-        date: parseDate(date),
-        specialist: parseSpecialist(specialist),
-        //might want to check this
-        diagnosisCodes: diagnosisCodes as Array<Diagnose['code']>,
-        type: parsedType,
-        healthCheckRating: healthCheckRating as HealthCheckRating,
-      };
+      if (diagnosisCodes) {
+        return {
+          description: parseDescription(description),
+          date: parseDate(date),
+          specialist: parseSpecialist(specialist),
+          diagnosisCodes: parseDiagnosisCodes(diagnosisCodes),
+          type: parsedType,
+          healthCheckRating: parseHealthCheckRating(healthCheckRating),
+        };
+      } else {
+        return {
+          description: parseDescription(description),
+          date: parseDate(date),
+          specialist: parseSpecialist(specialist),
+          type: parsedType,
+          healthCheckRating: parseHealthCheckRating(healthCheckRating),
+        };
+      }
     case "OccupationalHealthcare":
-      return {
-        description: parseDescription(description),
-        date: parseDate(date),
-        specialist: parseSpecialist(specialist),
-        //might want to check this
-        diagnosisCodes: diagnosisCodes as Array<Diagnose['code']>,
-        type: parsedType,
-        employerName: parseEmployerName(employerName),
-        //might want to check this
-        sickLeave: sickLeave as {startDate: string, endDate: string}
-      };
+      if (diagnosisCodes && sickLeave) {
+        return {
+          description: parseDescription(description),
+          date: parseDate(date),
+          specialist: parseSpecialist(specialist),
+          diagnosisCodes: parseDiagnosisCodes(diagnosisCodes),
+          type: parsedType,
+          employerName: parseEmployerName(employerName),
+          sickLeave: parseSickLeave(sickLeave)
+        };
+      } else if (diagnosisCodes && !sickLeave) {
+        return {
+          description: parseDescription(description),
+          date: parseDate(date),
+          specialist: parseSpecialist(specialist),
+          diagnosisCodes: parseDiagnosisCodes(diagnosisCodes),
+          type: parsedType,
+          employerName: parseEmployerName(employerName),
+        };
+      } else if (sickLeave && !diagnosisCodes) {
+        return {
+          description: parseDescription(description),
+          date: parseDate(date),
+          specialist: parseSpecialist(specialist),
+          type: parsedType,
+          employerName: parseEmployerName(employerName),
+          sickLeave: parseSickLeave(sickLeave)
+        };
+      } else {
+        return {
+          description: parseDescription(description),
+          date: parseDate(date),
+          specialist: parseSpecialist(specialist),
+          type: parsedType,
+          employerName: parseEmployerName(employerName),
+        };
+      }
     case "Hospital":
-      return {
-        description: parseDescription(description),
-        date: parseDate(date),
-        specialist: parseSpecialist(specialist),
-        //might want to check this
-        diagnosisCodes: diagnosisCodes as Array<Diagnose['code']>,
-        type: parsedType,
-        //might want to check this
-        discharge: discharge as {date: string, criteria: string}
-      };
+      if (diagnosisCodes) {
+        return {
+          description: parseDescription(description),
+          date: parseDate(date),
+          specialist: parseSpecialist(specialist),
+          diagnosisCodes: parseDiagnosisCodes(diagnosisCodes),
+          type: parsedType,
+          discharge: parseDischarge(discharge)
+        };
+      } else {
+        return {
+          description: parseDescription(description),
+          date: parseDate(date),
+          specialist: parseSpecialist(specialist),
+          type: parsedType,
+          discharge: parseDischarge(discharge)
+        };
+      }
     default:
       throw new Error('Incorrect entry');
+  }
+};
+
+const parseDischarge = (discharge: unknown): { date: string, criteria: string } => {
+  const asDischarge = discharge as Discharge;
+
+  if (!asDischarge?.date || !asDischarge?.criteria) {
+    throw new Error('Incorrect or missing discharge: ' + discharge);
+  }
+
+  if (!isString(asDischarge?.date) || !isString(asDischarge?.criteria)) {
+    throw new Error('Incorrect or missing discharge: ' + discharge);
+  }
+
+  return asDischarge;
+};
+
+const parseSickLeave = (sickLeave: unknown): { startDate: string, endDate: string } => {
+  const asSickLeave = sickLeave as SickLeave;
+
+  if (!asSickLeave?.startDate || !asSickLeave?.endDate) {
+    throw new Error('Incorrect or missing sick leave: ' + sickLeave);
+  }
+
+  if (!isString(asSickLeave?.startDate) || !isString(asSickLeave?.endDate)) {
+    throw new Error('Incorrect or missing sick leave: ' + sickLeave);
+  }
+
+  return asSickLeave;
+};
+
+const parseHealthCheckRating = (healthCheckRating: unknown): HealthCheckRating => {
+  if (!healthCheckRating || !isHealthCheckRating(healthCheckRating)) {
+    //as 0 is falsy, check if it is 0
+    if (healthCheckRating === 0) {
+      return healthCheckRating;
+    }
+
+    throw new Error('Incorrect or missing healthcheck rating: ' + healthCheckRating);
+  }
+
+  return healthCheckRating;
+};
+
+const parseDiagnosisCodes = (diagnosisCodes: unknown): Array<string> => {
+  if (!diagnosisCodes || !Array.isArray(diagnosisCodes)) {
+    throw new Error('Incorrect or missing diagnosis codes: ' + diagnosisCodes);
+  } {
+    diagnosisCodes.forEach(code => {
+      if (!isString(code)) {
+        throw new Error('Code not a string: ' + code);
+      }
+    });
+    return diagnosisCodes as Array<string>;
   }
 };
 
@@ -146,6 +245,11 @@ const isDate = (date: string): boolean => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isGender = (param: any): param is Gender => {
   return Object.values(Gender).includes(param);
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isHealthCheckRating = (param: any): param is HealthCheckRating => {
+  return Object.values(HealthCheckRating).includes(param);
 };
 
 export default {
