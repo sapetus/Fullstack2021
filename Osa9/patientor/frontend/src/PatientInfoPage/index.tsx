@@ -21,7 +21,6 @@ const PatientInfo = () => {
     setModalOpen(false);
   };
 
-  //This does not update local storage yet!
   const submitNewEntry = async (values: NewEntry) => {
     console.log(values);
     try {
