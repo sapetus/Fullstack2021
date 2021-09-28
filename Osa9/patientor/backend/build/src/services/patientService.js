@@ -24,8 +24,14 @@ const addPatient = (patient) => {
     patients.push(newPatient);
     return newPatient;
 };
+const addEntry = (entry, patient) => {
+    const newEntry = Object.assign({ id: (0, uuid_1.v1)() }, entry);
+    patient.entries.push(newEntry);
+    return newEntry;
+};
 exports.default = {
     getNonSensitivePatients,
     addPatient,
-    getPatientById
+    getPatientById,
+    addEntry
 };

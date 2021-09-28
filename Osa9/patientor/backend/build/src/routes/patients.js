@@ -12,7 +12,7 @@ router.get('/', (_req, res) => {
 });
 router.post('/', (req, res) => {
     try {
-        const newPatient = (0, utils_1.default)(req.body);
+        const newPatient = utils_1.default.toNewPatient(req.body);
         const addedPatient = patientService_1.default.addPatient(newPatient);
         res.json(addedPatient);
     }
@@ -27,6 +27,17 @@ router.get('/:id', (req, res) => {
     const patient = patientService_1.default.getPatientById(req.params.id);
     if (patient) {
         res.send(patient);
+    }
+    else {
+        res.status(400).send(`Patient with id '${req.params.id}' was not found`);
+    }
+});
+router.post('/:id/entries', (req, res) => {
+    const patientToUpdate = patientService_1.default.getPatientById(req.params.id);
+    if (patientToUpdate) {
+        const parsedEntry = utils_1.default.toNewEntry(req.body);
+        const newEntry = patientService_1.default.addEntry(parsedEntry, patientToUpdate);
+        res.json(newEntry);
     }
     else {
         res.status(400).send(`Patient with id '${req.params.id}' was not found`);

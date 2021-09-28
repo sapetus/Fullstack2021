@@ -38,7 +38,7 @@ interface TextProps extends FieldProps {
   placeholder: string;
 }
 
-export const TextField= ({
+export const TextField = ({
   field,
   label,
   placeholder
@@ -46,7 +46,7 @@ export const TextField= ({
   <Form.Field>
     <label>{label}</label>
     <Field placeholder={placeholder} {...field} />
-    <div style={{ color:'red' }}>
+    <div style={{ color: 'red' }}>
       <ErrorMessage name={field.name} />
     </div>
   </Form.Field>
@@ -62,12 +62,12 @@ interface NumberProps extends FieldProps {
   max: number;
 }
 
-export const NumberField = ({ field, label, min, max } : NumberProps ) => (
+export const NumberField = ({ field, label, min, max }: NumberProps) => (
   <Form.Field>
     <label>{label}</label>
     <Field {...field} type='number' min={min} max={max} />
 
-    <div style={{ color:'red' }}>
+    <div style={{ color: 'red' }}>
       <ErrorMessage name={field.name} />
     </div>
   </Form.Field>
@@ -104,6 +104,48 @@ export const DiagnosisSelection = ({
         fluid
         multiple
         search
+        selection
+        options={stateOptions}
+        onChange={onChange}
+      />
+      <ErrorMessage name={field} />
+    </Form.Field>
+  );
+};
+
+export const TypeSelection = ({
+  types,
+  setFieldValue,
+  setFieldTouched,
+  setSelectedType
+}: {
+  types: string[];
+  setFieldValue: FormikProps<{ type: string }>["setFieldValue"];
+  setFieldTouched: FormikProps<{ type: string }>["setFieldTouched"];
+  setSelectedType: (type: string) => void;
+}) => {
+  const field = "type";
+  const onChange = (
+    _event: React.SyntheticEvent<HTMLElement, Event>,
+    data: DropdownProps
+  ) => {
+    setFieldTouched(field, true);
+    setFieldValue(field, data.value);
+    setSelectedType(data.value as string);
+  };
+
+  const stateOptions = types.map(type => ({
+    key: type,
+    text: `${type}`,
+    value: type
+  }));
+
+  return (
+    <Form.Field>
+      <label>Type</label>
+      <Dropdown
+        placeholder={"Type"}
+        fluid
         selection
         options={stateOptions}
         onChange={onChange}

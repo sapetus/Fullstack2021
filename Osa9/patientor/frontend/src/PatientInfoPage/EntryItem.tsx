@@ -45,8 +45,8 @@ const EntryItem = ({ entry }: { entry: Entry }) => {
             <Icon name="stethoscope" size="large" />
           </h3>
           <p style={textStyle}>{entry.description}</p>
-          <HealthCheckIcon rating={entry.healthCheckRating} />
           <DiagnoseList diagnosisCodes={entry.diagnosisCodes} diagnoses={diagnoses} />
+          <HealthCheckIcon rating={entry.healthCheckRating} />
         </div>
       );
     default:

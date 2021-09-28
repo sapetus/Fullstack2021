@@ -2,7 +2,7 @@ import React from 'react';
 import { Formik, Form, Field } from 'formik';
 import { Grid, Button } from 'semantic-ui-react';
 
-import { TextField, DiagnosisSelection, NumberField } from '../AddPatientModal/FormField';
+import { TextField, DiagnosisSelection, NumberField, TypeSelection } from '../AddPatientModal/FormField';
 import { useStateValue } from '../state';
 import { NewEntry } from '../types';
 
@@ -11,7 +11,62 @@ interface Props {
   onCancel: () => void;
 }
 
-//currently only supports type of "HealthCheck"
+const HealthCheckForm = () => {
+  return (
+    <Field
+      label="Healthcheck Rating"
+      name="healthCheckRating"
+      component={NumberField}
+      min={0}
+      max={3}
+    />
+  );
+};
+
+const OccupationalHealthcareForm = () => {
+  return (
+    <div>
+      <Field
+        label="Employer Name"
+        placeholder="Employer Name"
+        name="employerName"
+        component={TextField}
+      />
+      <Field
+        label="Sick Leave Start Date"
+        placeholder="YYYY-MM-DD"
+        name="sickLeave.startDate"
+        component={TextField}
+      />
+      <Field
+        label="Sick Leave End Date"
+        placeholder="YYYY-MM-DD"
+        name="sickLeave.endDate"
+        component={TextField}
+      />
+    </div>
+  );
+};
+
+const HospitalForm = () => {
+  return (
+    <div>
+      <Field
+        label="Discharge Date (Required)"
+        placeholder="YYYY-MM-DD"
+        name="discharge.date"
+        component={TextField}
+      />
+      <Field
+        label="Discharge Criteria (Required)"
+        placeholder="Criteria"
+        name="discharge.criteria"
+        component={TextField}
+      />
+    </div>
+  );
+};
+
 const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
   const [{ diagnoses }] = useStateValue();
 
@@ -26,15 +81,49 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
         healthCheckRating: 0
       }}
       onSubmit={onSubmit}
+      validate={values => {
+        const requiredError = "Field is required";
+        const errors: { [field: string]: string } = {};
+        if (!values.type) {
+          errors.name = requiredError;
+        }
+        if (!values.description) {
+          errors.description = requiredError;
+        }
+        if (!values.date) {
+          errors.date = requiredError;
+        }
+        if (!values.specialist) {
+          errors.specialist = requiredError;
+        }
+        if (values.type === 'HealthCheck') {
+          if (!values.healthCheckRating) {
+            errors.healthCheckRating = requiredError;
+          }
+        } else if (values.type === 'OccupationalHealthcare') {
+          if (!values.employerName) {
+            errors.employerName = requiredError;
+          }
+        } else if (values.type === 'Hospital') {
+          //could not get errors working for discharge criteria and date
+        }
+        return errors;
+      }}
     >
-      {({ setFieldValue, setFieldTouched }) => {
+      {({ setFieldValue, setFieldTouched, isValid, dirty }) => {
+        const [selectedType, setSelectedType] = React.useState<string | undefined>();
+
+        const changeSelectedType = (type: string): void => {
+          setSelectedType(type);
+        };
+
         return (
           <Form className="form ui">
-            <Field
-              label="Type"
-              placeholder="Type"
-              name="type"
-              component={TextField}
+            <TypeSelection
+              types={["HealthCheck", "OccupationalHealthcare", "Hospital"]}
+              setFieldTouched={setFieldTouched}
+              setFieldValue={setFieldValue}
+              setSelectedType={changeSelectedType}
             />
             <Field
               label="Description"
@@ -59,13 +148,15 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
               setFieldTouched={setFieldTouched}
               diagnoses={Object.values(diagnoses)}
             />
-            <Field
-              label="Healthcheck Rating"
-              name="healthCheckRating"
-              component={NumberField}
-              min={0}
-              max={3}
-            />
+            {selectedType === "HealthCheck" &&
+              <HealthCheckForm />
+            }
+            {selectedType === "OccupationalHealthcare" &&
+              <OccupationalHealthcareForm />
+            }
+            {selectedType === "Hospital" &&
+              <HospitalForm />
+            }
             <Grid>
               <Grid.Column floated="left" width={5}>
                 <Button
@@ -78,9 +169,10 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
               </Grid.Column>
               <Grid.Column floated="right" width={5}>
                 <Button
-                  ype="submit"
+                  type="submit"
                   floated="right"
                   color="green"
+                  disabled={!dirty || !isValid}
                 >
                   Add
                 </Button>
